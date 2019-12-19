@@ -7,6 +7,10 @@ OBJ=$(SRC:.c=.o)
 
 HEADER=xbrightness.h
 
+install: all
+	cp $(NAME) /usr/local/bin/
+	@make clean
+
 all: $(NAME)
 
 $(NAME): $(OBJ) $(HEADER)

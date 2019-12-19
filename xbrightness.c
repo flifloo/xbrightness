@@ -13,23 +13,23 @@ void cmd(char *command, char *output) {
 }
 
 float current() {
-    char out[1028];
-    cmd("xrandr --verbose | grep Brightness: | cut -f2 -d\" \"", out);
-    return strtof(out, NULL);
+    char out[BUFFER];
+    cmd("xrandr --verbose | grep Brightness: | cut -f2 -d\" \"", out); //TODO: Check when 0 screen connected and two or more connected and catch output error
+    return strtof(out, NULL); //TODO: Return NULL when convert fail
 }
 
 void set(float brightness) {
-    char screen[1028];
-    char command[1028] = "xrandr --output ";
+    char screen[BUFFER]; //TODO: Better buffer
+    char command[BUFFER] = "xrandr --output ";
     char command2[] = " --brightness ";
     char b[3];
-    cmd("xrandr | grep \" connected\" | cut -f1 -d\" \"", screen);
+    cmd("xrandr | grep \" connected\" | cut -f1 -d\" \"", screen); //TODO: Check when 0 screen connected and two or more connected and catch output error
     screen[strlen(screen)-1] = 0;
     strcat(command, screen);
     strcat(command, command2);
     gcvt(brightness, 3, b);
     strcat(command, b);
-    cmd(command, NULL);
+    cmd(command, NULL); //TODO: Catch output error
 }
 
 int main(int argc, char **argv) {
@@ -48,10 +48,12 @@ int main(int argc, char **argv) {
         return 1;
     } else {
         if (argv[1][0] == '+' ||argv[1][0] == '-') {
-            set(current()+b);
+            b = current()+b;
+            set(b);
         } else {
             set(b);
         }
+        printf("Brightness set to %.2f\n", b);
     }
     return 0;
 }
