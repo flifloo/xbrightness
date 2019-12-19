@@ -1,34 +1,30 @@
 #include "xbrightness.h"
 
-void cmd(char *command, char *output) {
-    FILE *fp;
+static void cmd(char *command, char *output) {
+    FILE *fp = popen(command, "r");
 
-    fp = popen(command, "r");
     if (fp == NULL) {
         output[0] = 0;
     } else {
         fgets(output, sizeof(output), fp);
         pclose(fp);
+
+        if (output && output[strlen(output)-1] == '\n') {
+            output[strlen(output)-1] = 0;
+        }
     }
 }
 
 float current() {
     char out[BUFFER];
-    cmd("xrandr --verbose | grep Brightness: | cut -f2 -d\" \"", out); //TODO: Check when 0 screen connected and two or more connected and catch output error
-    return strtof(out, NULL); //TODO: Return NULL when convert fail
+    cmd("xrandr --verbose | grep Brightness: | cut -f2 -d\" \"", out);
+    return strtof(out, NULL);
 }
 
 void set(float brightness) {
-    char screen[BUFFER]; //TODO: Better buffer
-    char command[BUFFER] = "xrandr --output ";
-    char command2[] = " --brightness ";
-    char b[3];
-    cmd("xrandr | grep \" connected\" | cut -f1 -d\" \"", screen); //TODO: Check when 0 screen connected and two or more connected and catch output error
-    screen[strlen(screen)-1] = 0;
-    strcat(command, screen);
-    strcat(command, command2);
-    gcvt(brightness, 3, b);
-    strcat(command, b);
+    char screenName[64], b[3], command[BUFFER] = "xrandr --output ";
+    cmd("xrandr | grep \" connected\" | cut -f1 -d\" \"", screenName);
+    strcat(strcat(strcat(command, screenName), " --brightness "), gcvt(brightness, 3, b));
     cmd(command, NULL); //TODO: Catch output error
 }
 
