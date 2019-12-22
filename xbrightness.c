@@ -22,7 +22,7 @@ float current() {
 }
 
 void set(float brightness) {
-    char screenName[64], b[3], command[BUFFER] = "xrandr --output ";
+    char screenName[64], b[4], command[BUFFER] = "xrandr --output ";
     cmd("xrandr | grep \" connected\" | cut -f1 -d\" \"", screenName);
     strcat(strcat(strcat(command, screenName), " --brightness "), gcvt(brightness, 3, b));
     cmd(command, NULL); //TODO: Catch output error
